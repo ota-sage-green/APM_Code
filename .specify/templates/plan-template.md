@@ -31,7 +31,15 @@
 
 *GATE: Must pass before Phase 0 research. Re-check after Phase 1 design.*
 
-[Gates determined based on constitution file]
+- [ ] Modular JS structure defined for frontend changes (clear module boundaries
+      and no god-components planned).
+- [ ] Design aligns with `APM_PROJECT_PLAN.md` stack/architecture, or an approved
+      deviation with risk and migration notes is documented.
+- [ ] API/data contracts for changed behavior are documented and independently
+      testable from user stories.
+- [ ] Schema/data changes include integrity constraints, migration path, and
+      rollback considerations.
+- [ ] Work is sliced into small, reversible increments mapped to story/task IDs.
 
 ## Project Structure
 

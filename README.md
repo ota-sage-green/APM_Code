@@ -22,6 +22,10 @@ Generated documents appear in the `Output Docs/` folder.
 ## Project Plan
 See `APM_PROJECT_PLAN.md` for the full roadmap and Claude Code prompts.
 
+## Engineering Constitution
+Project standards for modular JavaScript structure, plan alignment, contract-first
+changes, and data integrity are defined in `.specify/memory/constitution.md`.
+
 ## Tech Stack (Planned)
 - Frontend: React 18 + Vite + shadcn/ui
 - Backend: FastAPI (Python)

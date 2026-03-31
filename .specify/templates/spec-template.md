@@ -5,6 +5,17 @@
 **Status**: Draft  
 **Input**: User description: "$ARGUMENTS"
 
+## Constitution Alignment *(mandatory)*
+
+- **CA-001 Modular JS Impact**: [List affected frontend modules/files and how
+  responsibilities stay separated.]
+- **CA-002 Plan Alignment**: [State how this feature aligns with
+  `APM_PROJECT_PLAN.md`; document approved deviations if any.]
+- **CA-003 Contract/Testability**: [List API/data contract additions/changes and
+  how each is independently testable.]
+- **CA-004 Data Integrity**: [If data/schema is touched, define constraints,
+  validation, migration, and rollback expectations.]
+
 ## User Scenarios & Testing *(mandatory)*
 
 <!--

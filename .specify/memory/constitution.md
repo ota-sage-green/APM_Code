@@ -1,50 +1,92 @@
-# [PROJECT_NAME] Constitution
-<!-- Example: Spec Constitution, TaskFlow Constitution, etc. -->
+<!--
+Sync Impact Report
+- Version change: template -> 1.0.0
+- Modified principles:
+  - [PRINCIPLE_1_NAME] -> I. Modular JavaScript By Default
+  - [PRINCIPLE_2_NAME] -> II. Plan-Aligned Architecture
+  - [PRINCIPLE_3_NAME] -> III. Contract-First and Testable Changes
+  - [PRINCIPLE_4_NAME] -> IV. Data Integrity and Migration Safety
+  - [PRINCIPLE_5_NAME] -> V. Traceable, Small, Reversible Delivery
+- Added sections:
+  - Architecture & Stack Constraints
+  - Delivery Workflow & Quality Gates
+- Removed sections: None
+- Templates requiring updates:
+  - ✅ .specify/templates/plan-template.md
+  - ✅ .specify/templates/spec-template.md
+  - ✅ .specify/templates/tasks-template.md
+  - ⚠ pending: .specify/templates/commands/*.md (directory not present in this repo)
+- Deferred TODOs: None
+-->
+
+# APM System Constitution
 
 ## Core Principles
 
-### [PRINCIPLE_1_NAME]
-<!-- Example: I. Library-First -->
-[PRINCIPLE_1_DESCRIPTION]
-<!-- Example: Every feature starts as a standalone library; Libraries must be self-contained, independently testable, documented; Clear purpose required - no organizational-only libraries -->
+### I. Modular JavaScript By Default
+Frontend code MUST be modular JavaScript organized by responsibility
+(`pages/`, `components/`, `api/`, reusable utilities). Files MUST have single
+clear purposes and avoid tightly coupled "god components". Shared UI logic MUST
+be extracted into composable modules before duplication is introduced.
+Rationale: modular JS supports maintainability and safer incremental delivery.
 
-### [PRINCIPLE_2_NAME]
-<!-- Example: II. CLI Interface -->
-[PRINCIPLE_2_DESCRIPTION]
-<!-- Example: Every library exposes functionality via CLI; Text in/out protocol: stdin/args → stdout, errors → stderr; Support JSON + human-readable formats -->
+### II. Plan-Aligned Architecture
+Implementation decisions MUST align with `APM_PROJECT_PLAN.md` unless an
+explicitly approved change is documented in the active spec and plan. The stack
+baseline is React + Vite frontend, FastAPI backend, PostgreSQL storage, and
+python-docx-based document generation. Deviations MUST include impact, risk, and
+migration notes.
+Rationale: architecture drift is the fastest path to delivery failure.
 
-### [PRINCIPLE_3_NAME]
-<!-- Example: III. Test-First (NON-NEGOTIABLE) -->
-[PRINCIPLE_3_DESCRIPTION]
-<!-- Example: TDD mandatory: Tests written → User approved → Tests fail → Then implement; Red-Green-Refactor cycle strictly enforced -->
+### III. Contract-First and Testable Changes
+API and data behavior MUST be specified before implementation using clear input,
+output, and error expectations. Every user story MUST define an independent test
+path; acceptance scenarios are mandatory in specs. For changed APIs, integration
+tests MUST validate request/response compatibility and error handling.
+Rationale: explicit contracts reduce regressions across frontend/backend boundaries.
 
-### [PRINCIPLE_4_NAME]
-<!-- Example: IV. Integration Testing -->
-[PRINCIPLE_4_DESCRIPTION]
-<!-- Example: Focus areas requiring integration tests: New library contract tests, Contract changes, Inter-service communication, Shared schemas -->
+### IV. Data Integrity and Migration Safety
+Schema changes MUST preserve data integrity with explicit constraints, indexes,
+and migration steps. Destructive changes require rollback guidance. Imports and
+bulk operations (including high-volume asset loads) MUST include validation,
+error summaries, and idempotent behavior where feasible.
+Rationale: APM reliability depends on durable and trustworthy asset/work data.
 
-### [PRINCIPLE_5_NAME]
-<!-- Example: V. Observability, VI. Versioning & Breaking Changes, VII. Simplicity -->
-[PRINCIPLE_5_DESCRIPTION]
-<!-- Example: Text I/O ensures debuggability; Structured logging required; Or: MAJOR.MINOR.BUILD format; Or: Start simple, YAGNI principles -->
+### V. Traceable, Small, Reversible Delivery
+Work MUST be shipped in small slices mapped to user stories and task IDs. Each
+change set MUST be reviewable, reversible, and documented by intent. Cross-cutting
+refactors require explicit justification in the plan's complexity tracking.
+Rationale: small reversible changes reduce risk and speed up troubleshooting.
 
-## [SECTION_2_NAME]
-<!-- Example: Additional Constraints, Security Requirements, Performance Standards, etc. -->
+## Architecture & Stack Constraints
 
-[SECTION_2_CONTENT]
-<!-- Example: Technology stack requirements, compliance standards, deployment policies, etc. -->
+- Frontend MUST remain React + Vite and use modular JS with clear folder
+  boundaries (`frontend/src/pages`, `frontend/src/components`, `frontend/src/api`).
+- Backend MUST remain FastAPI with SQLAlchemy data access and typed schemas.
+- PostgreSQL is the source of truth; file-based data is transitional and MUST
+  include import/migration plans.
+- Generated WI documents MUST continue using template-driven python-docx services.
 
-## [SECTION_3_NAME]
-<!-- Example: Development Workflow, Review Process, Quality Gates, etc. -->
+## Delivery Workflow & Quality Gates
 
-[SECTION_3_CONTENT]
-<!-- Example: Code review requirements, testing gates, deployment approval process, etc. -->
+1. Define or update spec with user stories, acceptance scenarios, and measurable
+   outcomes.
+2. Pass Constitution Check in the implementation plan before execution.
+3. Implement by user story priority (P1 -> P2 -> P3) with independent validation.
+4. Validate changed contracts, data constraints, and user-facing behavior.
+5. Update docs when architecture, setup, or workflow assumptions change.
 
 ## Governance
-<!-- Example: Constitution supersedes all other practices; Amendments require documentation, approval, migration plan -->
 
-[GOVERNANCE_RULES]
-<!-- Example: All PRs/reviews must verify compliance; Complexity must be justified; Use [GUIDANCE_FILE] for runtime development guidance -->
+This constitution is the top-level engineering standard for this repository.
+All plans, specs, tasks, and pull requests MUST demonstrate compliance.
 
-**Version**: [CONSTITUTION_VERSION] | **Ratified**: [RATIFICATION_DATE] | **Last Amended**: [LAST_AMENDED_DATE]
-<!-- Example: Version: 2.1.1 | Ratified: 2025-06-13 | Last Amended: 2025-07-16 -->
+Amendment policy:
+- Any contributor may propose a change via PR that updates this file and explains
+  impact on templates/process.
+- Versioning follows semantic rules: MAJOR for incompatible governance changes,
+  MINOR for new principles/sections or materially expanded rules, PATCH for
+  clarifications that do not alter obligations.
+- Compliance review occurs at plan approval and pull request review checkpoints.
+
+**Version**: 1.0.0 | **Ratified**: 2026-03-31 | **Last Amended**: 2026-03-31
