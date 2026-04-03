@@ -1,0 +1,334 @@
+openapi: 3.1.0
+info:
+  title: APM Core API (baseline)
+  version: 0.1.0
+  description: >
+    Contract sketch for the APM core baseline: equipment/FMEA, strategies, assets
+    (hierarchy + bulk import), WIs, and document generation. Work orders are out of
+    scope for the application; ERP owns execution.
+servers:
+  - url: http://localhost:8000
+    description: Local FastAPI
+paths:
+  /api/equipment-classes:
+    get:
+      summary: List equipment classes
+      operationId: listEquipmentClasses
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/EquipmentClass'
+    post:
+      summary: Create equipment class
+      operationId: createEquipmentClass
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EquipmentClassCreate'
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EquipmentClass'
+  /api/equipment-classes/{class_id}/fmea:
+    get:
+      summary: List FMEA rows for class
+      operationId: listFmeaForClass
+      parameters:
+        - $ref: '#/components/parameters/ClassId'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/FmeaRow'
+    post:
+      summary: Add FMEA row
+      operationId: createFmeaRow
+      parameters:
+        - $ref: '#/components/parameters/ClassId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FmeaRowCreate'
+      responses:
+        '201':
+          description: Created
+  /api/assets:
+    get:
+      summary: List/filter assets (tree roots or flat filters)
+      operationId: listAssets
+      parameters:
+        - name: site
+          in: query
+          schema:
+            type: string
+        - name: area
+          in: query
+          schema:
+            type: string
+        - name: class_id
+          in: query
+          schema:
+            type: string
+            format: uuid
+        - name: parent_asset_tag
+          in: query
+          description: Omit or null for root-level nodes; set for lazy children
+          schema:
+            type: string
+            nullable: true
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/AssetSummary'
+  /api/assets/{tag}/children:
+    get:
+      summary: Lazy-load child assets for tree expand
+      operationId: listAssetChildren
+      parameters:
+        - name: tag
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/AssetSummary'
+  /api/assets/import-bulk:
+    post:
+      summary: Bulk import assets (CSV/Excel), upsert on asset_tag
+      operationId: importAssetsBulk
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required:
+                - file
+              properties:
+                file:
+                  type: string
+                  format: binary
+      responses:
+        '200':
+          description: Import summary
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BulkImportSummary'
+  /api/assets/{tag}/strategies:
+    get:
+      summary: Strategies assigned to asset
+      operationId: listAssetStrategies
+      parameters:
+        - name: tag
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+    post:
+      summary: Assign strategy to asset
+      operationId: assignStrategyToAsset
+      parameters:
+        - name: tag
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AssetStrategyAssign'
+      responses:
+        '201':
+          description: Created
+  /api/wi/generate:
+    post:
+      summary: Generate WI documents (.docx) with ERP metadata
+      operationId: generateWiDocuments
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/WiGenerateRequest'
+      responses:
+        '200':
+          description: Files + metadata
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WiGenerateResponse'
+components:
+  parameters:
+    ClassId:
+      name: class_id
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+  schemas:
+    EquipmentClass:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        class_name:
+          type: string
+        type:
+          type: string
+        subclass:
+          type: string
+        description:
+          type: string
+          nullable: true
+    EquipmentClassCreate:
+      type: object
+      required:
+        - class_name
+      properties:
+        class_name:
+          type: string
+        type:
+          type: string
+        subclass:
+          type: string
+        description:
+          type: string
+    FmeaRow:
+      type: object
+    FmeaRowCreate:
+      type: object
+    AssetSummary:
+      type: object
+      properties:
+        asset_tag:
+          type: string
+        asset_name:
+          type: string
+        parent_asset_tag:
+          type: string
+          nullable: true
+        site:
+          type: string
+          nullable: true
+        area:
+          type: string
+          nullable: true
+        class_id:
+          type: string
+          format: uuid
+          nullable: true
+        asset_status:
+          type: string
+        criticality:
+          type: string
+          nullable: true
+        has_children:
+          type: boolean
+          description: Hint for tree UI to show expand affordance
+    BulkImportSummary:
+      type: object
+      required:
+        - inserted
+        - updated
+        - errors
+      properties:
+        inserted:
+          type: integer
+        updated:
+          type: integer
+        errors:
+          type: array
+          items:
+            type: object
+            properties:
+              row:
+                type: integer
+              reason:
+                type: string
+    AssetStrategyAssign:
+      type: object
+      required:
+        - strategy_id
+      properties:
+        strategy_id:
+          type: string
+          format: uuid
+        variant_name:
+          type: string
+          nullable: true
+        variant_notes:
+          type: string
+          nullable: true
+    WiGenerateRequest:
+      type: object
+      required:
+        - wi_nos
+      properties:
+        wi_nos:
+          type: array
+          items:
+            type: string
+        asset_tag:
+          type: string
+          nullable: true
+    WiGenerateResponse:
+      type: object
+      properties:
+        files:
+          type: array
+          items:
+            type: object
+            properties:
+              wi_no:
+                type: string
+              download_url:
+                type: string
+              asset_tag:
+                type: string
+                nullable: true
+              strategy_id:
+                type: string
+                format: uuid
+                nullable: true
+              strategy_name:
+                type: string
+                nullable: true
+              generated_at:
+                type: string
+                format: date-time

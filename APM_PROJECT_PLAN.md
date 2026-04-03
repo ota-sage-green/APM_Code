@@ -61,8 +61,7 @@ apm-system/
 │   │   │   ├── EquipmentLibrary.jsx
 │   │   │   ├── StrategyLibrary.jsx
 │   │   │   ├── AssetHierarchy.jsx
-│   │   │   ├── WorkInstructions.jsx
-│   │   │   └── WorkOrders.jsx
+│   │   │   └── WorkInstructions.jsx
 │   │   ├── components/
 │   │   │   ├── AssetTree.jsx       # hierarchical tree view
 │   │   │   ├── StrategyCard.jsx
